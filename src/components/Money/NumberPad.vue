@@ -32,28 +32,33 @@
         inputContent(event: MouseEvent) {
             const button = (event.target as HTMLButtonElement);
             const input = button.textContent as string;
-            if(this.output.length === 16){return;}
-            if(this.output === '0'){
-                if('0123456789'.indexOf(input)>=0){
-                    this.output = input
+            if (this.output.length === 16) {return;}
+            if (this.output === '0') {
+                if ('0123456789'.indexOf(input) >= 0) {
+                    this.output = input;
                 } else {
-                    this.output += input
+                    this.output += input;
                 }
-                return
+                return;
             }
-            if(this.output.indexOf('.')>=0 && input === '0'){return;}
-            this.output += input
+            if (this.output.indexOf('.') >= 0 && input === '0') {return;}
+            this.output += input;
         }
-        remove(){
-            if(this.output.length === 1){
-                this.output = '0'
-            } else {this.output = this.output.substr(1)}
+
+        remove() {
+            if (this.output.length === 1) {
+                this.output = '0';
+            } else {this.output = this.output.substr(1);}
         }
-        clear(){
-            this.output = '0'
+
+        clear() {
+            this.output = '0';
         }
-        ok(){
-            this.$emit('update:value', this.output)
+
+        ok() {
+            this.$emit('update:value', this.output);
+            this.$emit('submit', this.output);
+            this.output = '0';
         }
     }
 </script>

@@ -1,17 +1,76 @@
 <template>
-    <div>
-        <Layout>
-            <p>Labels</p>
-        </Layout>
-    </div>
+    <Layout>
+        <ol class="tags">
+            <li v-for="tag in tags" :key="tag">
+                <span>{{tag}}</span>
+                <Icon name="right"/>
+            </li>
+        </ol>
+        <div class="createTag-wrapper">
+            <button class="createTag" @click="createTag">新增标签</button>
+        </div>
+    </Layout>
 </template>
 
 <script lang="ts">
-    export default {
-        name: 'Labels',
+    import Vue from 'vue';
+    import {Component} from 'vue-property-decorator';
+    import {tagListModel} from '@/models/tagListModel';
+
+    tagListModel.fetch();
+
+    @Component
+    export default class Labels extends Vue {
+        tags = tagListModel.data;
+
+        createTag() {
+            const name = window.prompt('请输入标签名');
+            if (name) {
+                const message = tagListModel.create(name);
+                if (message === 'success') {
+                    window.alert('添加成功！');
+                } else if (message === 'duplicated') {
+                    window.alert('标签名重复！');
+                }
+            }
+        }
     }
 </script>
 
 <style lang="scss" scoped>
+    .tags {
+        background: white;
+        font-size: 16px;
+        padding-left: 16px;
 
+        > li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 44px;
+            border-bottom: 1px solid #e6e6e6;
+
+            svg {
+                color: #666;
+                margin-right: 16px;
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+
+    .createTag {
+        background: #484848;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0 16px;
+        height: 40px;
+
+        &-wrapper {
+            padding: 16px;
+            text-align: center;
+            margin-top: 44-16px;
+        }
+    }
 </style>

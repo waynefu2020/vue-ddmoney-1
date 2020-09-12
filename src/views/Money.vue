@@ -16,16 +16,19 @@
     import Types from '@/components/Money/Types.vue';
     import Notes from '@/components/Money/Notes.vue';
     import Tags from '@/components/Money/Tags.vue';
+    import {tagListModel} from '@/models/tagListModel';
+    import {recordListModel} from '@/models/recordListModel';
 
-    const model = require('@/model.ts').model;
+    const model = require('@/models/recordListModel.ts').recordListModel;
 
-    const recordList = model.fetch();
+    const recordList = recordListModel.fetch();
+    const tagList = tagListModel.fetch();
 
     @Component({
         components: {Tags, Notes, Types, NumberPad}
     })
     export default class Money extends Vue {
-        tags = ['衣', '食', '住', '行'];
+        tags = tagList;
         record: RecordItem = {
             tags: [], notes: '', type: '-', amount: 0
         };

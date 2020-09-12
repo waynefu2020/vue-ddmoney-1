@@ -1,8 +1,13 @@
 const localStorageKeyName = 'tagList';
 
+type tag = {
+    id: string;
+    name: string;
+}
+
 type tagListModel = {
-    data: string[];
-    fetch: () => string[];
+    data: tag[];
+    fetch: () => tag[];
     create: (name: string) => 'success' | 'duplicated'; // 联合类型
     save: () => void;
 }
@@ -10,13 +15,14 @@ type tagListModel = {
 const tagListModel: tagListModel = {
     data: [],
     create(name: string) {
-        if(this.data.indexOf(name)>=0){return 'duplicated';}
-        this.data.push(name);
+        const names = this.data.map(item => item.name);
+        if (names.indexOf(name) >= 0) {return 'duplicated';}
+        this.data.push({id: name, name: name});
         this.save();
         return 'success';
     },
     fetch() {
-        this.data = JSON.parse(window.localStorage.getItem(localStorageKeyName)||'[]');
+        this.data = JSON.parse(window.localStorage.getItem(localStorageKeyName) || '[]');
         return this.data;
     },
     save() {

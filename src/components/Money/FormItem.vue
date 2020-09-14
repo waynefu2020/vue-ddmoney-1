@@ -21,7 +21,6 @@
         @Prop({required: true}) fieldName!: string;
         @Prop() placeholder?: string;
 
-        @Watch('value')
         onUpdateNotes(value: string){
             this.$emit('update:value', value)
         }

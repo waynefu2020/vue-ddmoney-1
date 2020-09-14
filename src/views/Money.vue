@@ -19,26 +19,29 @@
     import Types from '@/components/Money/Types.vue';
     import FormItem from '@/components/Money/FormItem.vue';
     import Tags from '@/components/Money/Tags.vue';
-    import store from '@/store/index2';
 
-    const recordList = store.recordList;
 
     @Component({
-        components: {Tags, FormItem, Types, NumberPad}
+        components: {Tags, FormItem, Types, NumberPad},
+        computed:{
+            recordList(){
+                return this.$store.state.recordList;
+            }
+        }
     })
     export default class Money extends Vue {
-        tags = store.tagList;
         record: RecordItem = {
             tags: [], notes: '', type: '-', amount: 0
         };
-        recordList: RecordItem[] = recordList;
-
+        created(){
+            this.$store.commit('fetchRecords')
+        }
         onUpdateNotes(value: string) {
             this.record.notes = value;
         }
 
         saveRecord() {
-            store.createRecord(this.record)
+            this.$store.commit('recordList', this.record)
         }
 
     }

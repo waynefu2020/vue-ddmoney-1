@@ -7,49 +7,40 @@
                 <FormItem @update:value="onUpdateNotes"
                           field-name="备注" placeholder="请输入备注"/>
             </div>
-            <Tags :data-source.sync="tags" @update:value="onUpdateTags"/>
+            <Tags/>
         </Layout>
     </div>
 </template>
 
 <script lang="ts">
     import Vue from 'vue';
-    import {Component, Watch} from 'vue-property-decorator';
+    import {Component} from 'vue-property-decorator';
     import NumberPad from '@/components/Money/NumberPad.vue';
     import Types from '@/components/Money/Types.vue';
     import FormItem from '@/components/Money/FormItem.vue';
     import Tags from '@/components/Money/Tags.vue';
-    import {recordListModel} from '@/models/recordListModel';
+    import store from '@/store/index2';
 
-
-    const recordList = recordListModel.fetch();
+    const recordList = store.recordList;
 
     @Component({
         components: {Tags, FormItem, Types, NumberPad}
     })
     export default class Money extends Vue {
-        tags = window.tagList;
+        tags = store.tagList;
         record: RecordItem = {
             tags: [], notes: '', type: '-', amount: 0
         };
         recordList: RecordItem[] = recordList;
-
-        onUpdateTags(value: string[]) {
-            this.record.tags = value;
-        }
 
         onUpdateNotes(value: string) {
             this.record.notes = value;
         }
 
         saveRecord() {
-            recordListModel.create(this.record)
+            store.createRecord(this.record)
         }
 
-        @Watch('recordList')
-        onRecordListChange() {
-            recordListModel.save();
-        }
     }
 </script>
 

@@ -7,7 +7,7 @@
         </div>
         <div class="form-wrapper">
             <FormItem :value="tag.name"
-                      @update:value="updateTag"
+                      @update:value="update"
                       field-name="标签名" placeholder="请输入标签名"/>
         </div>
         <div class="button-wrapper">
@@ -19,38 +19,33 @@
 <script lang="ts">
     import Vue from 'vue';
     import {Component} from 'vue-property-decorator';
-    import {tagListModel} from '@/models/tagListModel';
     import FormItem from '@/components/Money/FormItem.vue';
     import Button from '@/components/Button.vue';
+    import store from '@/store/index2';
 
     @Component({
         components: {FormItem, Button}
     })
     export default class EditLabel extends Vue {
-        tag?: { id: string; name: string } = undefined;
+        tag?: Tag = undefined;
 
         created() {
-            const id = this.$route.params.id;
-            tagListModel.fetch();
-            const tags = tagListModel.data;
-            const tag = tags.filter(t => t.id === id)[0];
-            if (tag) {
-                this.tag = tag;
-                console.log(this.tag);
-            } else {
+            this.tag = store.findTag(this.$route.params.id);
+            if (!this.tag) {
                 this.$router.replace('/404');
+
             }
         }
 
-        updateTag(name: string) {
+        update(name: string) {
             if (this.tag) {
-                tagListModel.update(this.tag.id, name);
+                store.updateTag(this.tag.id, name);
             }
         }
 
         remove() {
             if (this.tag) {
-                if (tagListModel.remove(this.tag.id)) {
+                if (store.removeTag(this.tag.id)) {
                     this.$router.back();
                 } else {
                     window.alert('删除失败')

@@ -2,24 +2,71 @@
     <div>
         <Layout>
             <Tabs class-prefix="type" :value.sync="type" :data-source="recordTypeList"/>
-            <Tabs class-prefix="interval" :value.sync="interval" :data-source="intervalList"/>
-            <div>
-                type: {{type}}
-                interval: {{interval}}
-            </div>
+            <Tabs class-prefix="interval" :value.sync="interval"
+                  :data-source="intervalList" height="48px"/>
+                <ol>
+                    <li v-for="(group, index) in result" :key="index">
+                        <h3 class="title">{{group.title}}</h3>
+                        <ol>
+                            <li v-for="item in group.items" :key="item.id" class="record">
+                                <span>{{tagString(item.tags)}}</span>
+                                <span class="notes">{{item.notes}}</span>
+                                <span>￥{{item.amount}}</span>
+                            </li>
+                        </ol>
+                    </li>
+                </ol>
+            <ol>
+                <li v-for="(group, index) in result" :key="index">
+                    <h3 class="title">{{group.title}}</h3>
+                    <ol>
+                        <li v-for="item in group.items" :key="item.id" class="record">
+                            <span>{{tagString(item.tags)}}</span>
+                            <span class="notes">{{item.notes}}</span>
+                            <span>￥{{item.amount}}</span>
+                        </li>
+                    </ol>
+                </li>
+            </ol>
         </Layout>
     </div>
 </template>
 
 <style lang="scss" scoped>
-    ::v-deep .type-tabs-item{
-        background: white;
-        &.selected{
-            background: #bcbcbc;
-            &::after{
-                display: none;
+    ::v-deep {
+        .type-tabs-item {
+            background: white;
+
+            &.selected {
+                background: #bcbcbc;
+
+                &::after {
+                    display: none;
+                }
             }
         }
+
+        li.interval-tabs-item {
+            height: 48px;
+        }
+    }
+    %item{
+        padding: 6px 16px;
+        line-height: 24px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .title{
+        @extend %item
+    }
+    .record{
+        background: white;
+        @extend %item
+    }
+    .notes{
+        margin-right: auto;
+        margin-left: 16px;
+        color: #999999;
     }
 </style>
 
@@ -31,9 +78,32 @@
     import recordTypeList from '@/constants/recordTypeList';
 
     @Component({
-        components:{Tabs}
+        components: {Tabs}
     })
-    export default class Statistics extends Vue{
+    export default class Statistics extends Vue {
+        tagString(tags: Tag[]){
+            return tags.length === 0 ? '无' : tags.join(',')
+        }
+        get recordList() {
+            return (this.$store.state as RootState).recordList;
+        }
+
+        get result() {
+            const {recordList} = this;
+            type HashTableValue = {title: string; items: RecordList[]}
+            const hashTable: {[key: string]: HashTableValue } = {};
+            for (let i = 0; i < recordList.length; i++) {
+                const [date, time] = recordList[i].createAt!.split('T');
+                hashTable[date] = hashTable[date] || {title: date, items: []};
+                hashTable[date].items.push(recordList[i]);
+            }
+            return hashTable;
+        }
+
+        beforeCreate() {
+            this.$store.commit('fetchRecords');
+        }
+
         type = '-';
         interval = 'day';
         intervalList = intervalList;
